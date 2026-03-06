@@ -1,5 +1,5 @@
 from .models import Post
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .serializers import PostSerializer
 
@@ -12,3 +12,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+    filter_backends = [filters.SearchFilter]
+
+    search_fields = ["title", "content"]
