@@ -18,6 +18,7 @@ class Post(models.Model):
     slug = models.SlugField(unique=True)
     content = models.TextField()
     featured_image = CloudinaryField("image", blank=True, null=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
 
     status = models.CharField(
         max_length=10, choices=Status.choices, default=Status.DRAFT

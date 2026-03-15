@@ -41,7 +41,7 @@ SECRET_KEY = os.getenv(
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 # Configure allowed hosts based on environment
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"] if DEBUG else ["mydomain.com"]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
 
 # Application definition
@@ -55,12 +55,15 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # new
     "rest_framework",
+    "corsheaders",
     "blog",
     "cloudinary",
     "cloudinary_storage",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -158,7 +161,8 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "100/day",
         "user": "1000/day"
-    }
+    },
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",    
 }
 
 CACHES = {
@@ -169,3 +173,31 @@ CACHES = {
 }
 
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+
+# CORS Settings
+cors_origins = os.getenv("CORS_ALLOWED_ORIGINS", "")
+if cors_origins:
+    CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins.split(",")]
+else:
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
+    ]
+
+CORS_ALLOW_CREDENTIALS = True
+
+# Allow all origins in development (remove in production)
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+
+# API Documentation Settings
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Blog API",
+    "DESCRIPTION": "A RESTful blog API built with Django and Django REST Framework",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SCHEMA_PATH_PREFIX": "/api/",
+}

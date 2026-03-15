@@ -9,8 +9,8 @@ router.register("comments", CommentViewSet)
 
 urlpatterns = [
     path("auth/register/", RegisterView.as_view(), name="register"),
-    path("posts/<int:post_id>/like/", like_post),
-    path("posts/<int:post_id>/unlike/", unlike_post),
+    path("posts/<slug:slug>/like/", like_post),
+    path("posts/<slug:slug>/unlike/", unlike_post),
 ]
 
 urlpatterns += router.urls

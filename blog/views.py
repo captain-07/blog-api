@@ -24,7 +24,8 @@ class PostViewSet(viewsets.ModelViewSet):
 
     lookup_field = "slug"
 
-    
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -46,9 +47,9 @@ class RegisterView(generics.CreateAPIView):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def like_post(request, post_id):
+def like_post(request, slug):
     try:
-        post = Post.objects.get(id=post_id)
+        post = Post.objects.get(slug=slug)
     except Post.DoesNotExist:
         return Response({"error": "Post not found"}, status=404)
 
@@ -60,13 +61,13 @@ def like_post(request, post_id):
     if created:
         return Response({"message": "Post liked"})
     else:
-        return Response({"message": "Already liked"})
+        return Response({"message": "Already liked"}, status=400)
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
-def unlike_post(request, post_id):
+def unlike_post(request, slug):
     try:
-        post = Post.objects.get(id=post_id)
+        post = Post.objects.get(slug=slug)
     except Post.DoesNotExist:
         return Response({"error": "Post not found"}, status=404)
 
