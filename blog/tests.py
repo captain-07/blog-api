@@ -151,6 +151,33 @@ class CommentAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['results']), 1)
 
+    def test_get_comments_filtered_by_post_slug(self):
+        # Create another post and comment
+        other_post = Post.objects.create(
+            title='Other Post',
+            slug='other-post',
+            content='Other content',
+            author=self.user,
+            status=Post.Status.PUBLISHED
+        )
+        Comment.objects.create(
+            post=self.post,
+            user=self.user,
+            content='Comment on first post'
+        )
+        Comment.objects.create(
+            post=other_post,
+            user=self.user,
+            content='Comment on other post'
+        )
+        
+        # Test filtering by first post slug
+        url = f'/api/comments/?post_slug={self.post.slug}'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['content'], 'Comment on first post')
+
 
 class LikeAPITest(APITestCase):
     def setUp(self):

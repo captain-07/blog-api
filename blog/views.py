@@ -10,7 +10,8 @@ from rest_framework.response import Response
 
 class PostViewSet(viewsets.ModelViewSet):
 
-    queryset = Post.objects.filter(status=Post.Status.PUBLISHED)
+    queryset = Post.objects.filter(status=Post.Status.PUBLISHED
+                ).select_related("author").prefetch_related("comments__user", "likes")
 
     serializer_class = PostSerializer
     permission_classes = [IsAdminOrReadOnly]
@@ -31,10 +32,15 @@ class PostViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
 
     queryset = Comment.objects.all().order_by("-created_at")
-
     serializer_class = CommentSerializer
-
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        queryset = Comment.objects.all().order_by("-created_at")
+        post_slug = self.request.query_params.get('post_slug')
+        if post_slug:
+            queryset = queryset.filter(post__slug=post_slug)
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
