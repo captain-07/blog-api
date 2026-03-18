@@ -1,11 +1,12 @@
 from .models import Post, Comment, Like
 from rest_framework import viewsets, filters, generics
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from .serializers import PostSerializer, CommentSerializer, RegisterSerializer
+from .serializers import PostSerializer, CommentSerializer, RegisterSerializer, UserSerializer
 from .permissions import IsAdminOrReadOnly
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django.contrib.auth.models import User
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -50,6 +51,13 @@ class RegisterView(generics.CreateAPIView):
 
     serializer_class = RegisterSerializer
     permission_classes = []
+
+
+class AuthorViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
