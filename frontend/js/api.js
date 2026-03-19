@@ -52,7 +52,7 @@ async function apiRequest(endpoint, options = {}) {
  * @returns {Promise} Posts data
  */
 async function getPosts(page = 1, pageSize = 10) {
-    return apiRequest(`/posts/?page=${page}&page_size=${pageSize}`);
+    return apiRequest(`posts/?page=${page}&page_size=${pageSize}`);
 }
 
 /**
@@ -61,7 +61,7 @@ async function getPosts(page = 1, pageSize = 10) {
  * @returns {Promise} Post data
  */
 async function getPost(slug) {
-    return apiRequest(`/posts/${slug}/`);
+    return apiRequest(`posts/${slug}/`);
 }
 
 /**
@@ -72,7 +72,7 @@ async function getPost(slug) {
  * @returns {Promise} Author posts data
  */
 async function getPostsByAuthor(authorId, page = 1, pageSize = 10) {
-    return apiRequest(`/posts/?author=${authorId}&page=${page}&page_size=${pageSize}`);
+    return apiRequest(`posts/?author=${authorId}&page=${page}&page_size=${pageSize}`);
 }
 
 /**
@@ -81,7 +81,7 @@ async function getPostsByAuthor(authorId, page = 1, pageSize = 10) {
  * @returns {Promise} Author data
  */
 async function getAuthor(authorId) {
-    return apiRequest(`/authors/${authorId}/`);
+    return apiRequest(`authors/${authorId}/`);
 }
 
 /**
@@ -90,7 +90,7 @@ async function getAuthor(authorId) {
  * @returns {Promise} Updated post data
  */
 async function likePost(slug) {
-    return apiRequest(`/posts/${slug}/like/`, {
+    return apiRequest(`posts/${slug}/like/`, {
         method: 'POST',
     });
 }
@@ -103,7 +103,7 @@ async function likePost(slug) {
  * @returns {Promise} Search results
  */
 async function searchPosts(query, page = 1, pageSize = 10) {
-    return apiRequest(`/posts/?search=${query}&page=${page}&page_size=${pageSize}`);
+    return apiRequest(`posts/?search=${query}&page=${page}&page_size=${pageSize}`);
 }
 
 // Export for use in other modules
