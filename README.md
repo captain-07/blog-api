@@ -1,6 +1,6 @@
-# Django Blog API
+# Deb Blogs API
 
-A RESTful blog API built with Django and Django REST Framework.
+A RESTful blog API built with Django and Django REST Framework for Deb Blogs.
 
 ## Features
 

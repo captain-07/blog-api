@@ -135,23 +135,10 @@ async function loadAuthorPosts() {
 function renderAuthor(author) {
     // Handle different data structures
     const name = author.username || author.name || 'Unknown Author';
-    const bio = author.bio || author.description || '';
-    const email = author.email || '';
-    const avatar = author.avatar || author.profile_image || '';
+    const bio = author.bio || author.description || 'Contributing writer and enthusiast.';
 
-    // Create initials for avatar if no image provided
-    const initials = name.slice(0, 2).toUpperCase();
-
-    authorSection.innerHTML = `
-        <div class="author-header">
-            <div class="author-avatar">
-                ${avatar ? `<img src="${avatar}" alt="${escapeHtml(name)}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : initials}
-            </div>
-            <h1 class="author-name">${escapeHtml(name)}</h1>
-            ${bio ? `<p class="author-bio">${escapeHtml(bio)}</p>` : ''}
-            ${email ? `<p class="text-muted"><small>📧 ${escapeHtml(email)}</small></p>` : ''}
-        </div>
-    `;
+    document.getElementById('authorName').textContent = name;
+    document.getElementById('authorBio').textContent = bio;
 }
 
 /**
@@ -170,44 +157,42 @@ function renderPosts(posts) {
  * Create a post card element
  */
 function createPostCard(post) {
-    const card = document.createElement('div');
+    const card = document.createElement('article');
     card.className = 'post-card';
     
-    // Handle different data structures
     const title = post.title || 'Untitled';
-    const content = post.content || post.body || '';
-    const authorName = post.author?.username || post.author_name || currentAuthor?.username || currentAuthor?.name || 'Unknown Author';
-    const authorId = post.author?.id || post.author_id || currentAuthor?.id;
-    const date = post.created_at || post.published_date || post.date;
-    const slug = post.slug || post.id;
+    const content = post.content || '';
+    const authorName = post.author?.username || currentAuthor?.username || 'Unknown';
+    const authorId = post.author?.id || currentAuthor?.id;
+    const date = post.created_at || post.published_at;
+    const slug = post.slug;
+    const image = post.featured_image || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=800';
 
-    // Create preview (first 150 characters)
     const preview = content.length > 150 ? content.substring(0, 150) + '...' : content;
-    
-    // Format date
     const formattedDate = date ? new Date(date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+        year: 'numeric', month: 'short', day: 'numeric'
     }) : '';
 
     card.innerHTML = `
-        <h2 class="post-title">${escapeHtml(title)}</h2>
-        <p class="post-preview">${escapeHtml(preview)}</p>
-        <div class="post-meta">
+        <a href="post.html?slug=${slug}" class="post-card-image">
+            <img src="${image}" alt="${escapeHtml(title)}">
+        </a>
+        <div class="post-card-category">Journal</div>
+        <h2 class="post-card-title">
+            <a href="post.html?slug=${slug}">${escapeHtml(title)}</a>
+        </h2>
+        <p class="post-card-excerpt">${escapeHtml(preview)}</p>
+        <div class="post-card-meta">
             <span class="post-author">
-                <a href="author.html?id=${authorId}" onclick="event.stopPropagation()">
-                    ${escapeHtml(authorName)}
-                </a>
+                <a href="author.html?id=${authorId}">By ${escapeHtml(authorName)}</a>
             </span>
+            <div class="dot"></div>
             ${formattedDate ? `<span class="post-date">${formattedDate}</span>` : ''}
+            <div class="dot"></div>
+            <span style="font-size: 0.8rem; opacity: 0.7;">💬 ${post.comments?.length || 0}</span>
+            <span style="font-size: 0.8rem; opacity: 0.7; margin-left: 0.5rem;">❤️ ${post.likes_count || 0}</span>
         </div>
     `;
-
-    // Add click handler to navigate to post detail
-    card.addEventListener('click', () => {
-        window.location.href = `post.html?slug=${slug}`;
-    });
 
     return card;
 }

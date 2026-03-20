@@ -1,135 +1,170 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Blog</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
-    
-    <style>
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 2rem;
-            background-color: var(--background-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-medium);
-        }
-        
-        .login-title {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            transition: var(--transition-smooth);
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-        }
-        
-        .login-button {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-        }
-        
-        .login-button:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-        
-        .error-message {
-            color: #FF3B30;
-            font-size: 0.875rem;
-            margin-top: 1rem;
-            text-align: center;
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="login-container">
-            <h1 class="login-title">Login</h1>
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" id="username" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" id="password" class="form-control" required>
-                </div>
-                <button type="submit" class="login-button">Sign In</button>
-                <div id="errorMessage" class="error-message">Invalid username or password</div>
-            </form>
-            <div class="text-center mt-4">
-                <a href="index.html" class="text-muted"><small>Back to Home</small></a>
-            </div>
-        </div>
-    </div>
 
-    <!-- API Module -->
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Deb Blogs — Sign In</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+    <!-- Site Header -->
+
+    <header class="site-header">
+
+        <div class="container">
+
+            <a href="index.html" class="logo">Deb Blogs</a>
+
+            <nav>
+
+                <ul class="nav-links">
+
+                    <li><a href="index.html">Home</a></li>
+
+                    <li><a href="gallery.html">Gallery</a></li>
+
+                </ul>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- Main Content -->
+
+    <main class="container">
+
+        <div class="auth-form-container">
+
+            <div class="text-center mb-4">
+
+                <h2 class="accent-text" style="font-size: 2rem; margin-bottom: 0.5rem;">Welcome Back</h2>
+
+                <p class="text-muted">Sign in to your account</p>
+
+            </div>
+
+
+
+            <form id="loginForm">
+
+                <div class="form-group">
+
+                    <label for="username">Username</label>
+
+                    <input type="text" id="username" class="form-control" required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="password">Password</label>
+
+                    <input type="password" id="password" class="form-control" required>
+
+                </div>
+
+                <div id="loginError" style="color: #e74c3c; font-size: 0.85rem; margin-bottom: 1.5rem; display: none;">
+
+                    Invalid credentials. Please try again.
+
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%;">Sign In</button>
+
+            </form>
+
+
+
+            <div class="text-center" style="margin-top: 2rem;">
+
+                <p class="text-muted" style="font-size: 0.9rem;">
+
+                    Don't have an account? <a href="#" class="accent-text">Contact Admin</a>
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+
+    <!-- Footer -->
+
+    <footer class="site-footer">
+
+        <div class="container">
+
+            <div class="footer-logo">Deb Blogs</div>
+
+            <p class="copyright">&copy; 2026 Deb Blogs. Crafted with elegance.</p>
+
+        </div>
+
+    </footer>
+
+
+
+    <!-- Scripts -->
+
     <script src="js/api.js"></script>
-    
+
     <script>
+
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
+
             e.preventDefault();
+
             const username = document.getElementById('username').value;
+
             const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('errorMessage');
-            
+
+            const errorDiv = document.getElementById('loginError');
+
+
+
             try {
-                const response = await fetch('https://my-blog-evfv.onrender.com/api/auth/login/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    localStorage.setItem('access_token', data.access);
-                    localStorage.setItem('refresh_token', data.refresh);
+
+                const response = await window.BlogAPI.login(username, password);
+
+                if (response.access) {
+
+                    localStorage.setItem('access_token', response.access);
+
+                    localStorage.setItem('refresh_token', response.refresh);
+
                     window.location.href = 'index.html';
-                } else {
-                    errorMessage.style.display = 'block';
+
                 }
+
             } catch (error) {
+
                 console.error('Login error:', error);
-                errorMessage.style.display = 'block';
-                errorMessage.textContent = 'Connection error. Please try again.';
+
+                errorDiv.style.display = 'block';
+
             }
+
         });
+
     </script>
+
 </body>
+
 </html>
+

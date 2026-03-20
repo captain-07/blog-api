@@ -3,117 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallery - Blog</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Custom CSS -->
+    <title>Deb Blogs — Gallery</title>
     <link rel="stylesheet" href="css/style.css">
-    
-    <style>
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-        
-        .gallery-item {
-            aspect-ratio: 16/9;
-            background-color: var(--surface-color);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-            box-shadow: var(--shadow-light);
-        }
-        
-        .gallery-item:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-medium);
-        }
-        
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .gallery-placeholder {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: var(--secondary-color);
-            background: linear-gradient(135deg, var(--surface-color), var(--background-color));
-        }
-    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
+    <!-- Site Header -->
+    <header class="site-header">
         <div class="container">
-            <nav class="navbar navbar-expand-lg navbar-light">
-                <a href="index.html" class="navbar-brand">Blog</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.html">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="gallery.html">Gallery</a>
-                        </li>
-                    </ul>
-                </div>
+            <a href="index.html" class="logo">Deb Blogs</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="gallery.html" class="active">Gallery</a></li>
+                    <li id="authNav">
+                        <!-- Populated by JS -->
+                    </li>
+                </ul>
             </nav>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="main-content">
+    <!-- Hero Section -->
+    <section class="hero">
         <div class="container">
-            <!-- Page Title -->
-            <div class="text-center mb-5">
-                <h1>Gallery</h1>
-                <p class="text-muted">Visual stories and moments</p>
-            </div>
+            <h1>Visual <span class="accent-text">Narratives</span></h1>
+            <p class="hero-sub">A collection of moments captured through the lens.</p>
+        </div>
+    </section>
 
-            <!-- Gallery Grid -->
-            <div class="gallery-grid" id="galleryGrid">
-                <!-- Gallery items will be dynamically inserted here -->
-            </div>
+    <!-- Main Content -->
+    <main class="container">
+        <div class="gallery-grid" id="galleryGrid">
+            <!-- Gallery items will be dynamically inserted here -->
+        </div>
 
-            <!-- Empty State -->
-            <div class="empty-state" id="emptyState" style="display: none;">
-                <div class="empty-state-icon">🖼️</div>
-                <div class="empty-state-text">No images available</div>
-                <div class="empty-state-subtext">Gallery images will appear here</div>
-            </div>
+        <div id="emptyState" style="display: none; text-align: center; padding: 4rem;">
+            <p class="text-muted">No images available in the collection yet.</p>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="site-footer">
         <div class="container">
-            <p class="text-muted mb-0">&copy; 2024 Blog. Minimal design with care.</p>
+            <div class="footer-logo">Deb Blogs</div>
+            <nav class="footer-nav">
+                <a href="index.html">Home</a>
+                <a href="gallery.html">Gallery</a>
+                <a href="login.html">Login</a>
+            </nav>
+            <p class="copyright">&copy; 2026 Deb Blogs. Crafted with elegance.</p>
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Gallery Script -->
+    <!-- Scripts -->
     <script>
-        /**
-         * Gallery Page JavaScript
-         * Simple gallery with placeholder images
-         */
-        
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', () => {
+            const authNav = document.getElementById('authNav');
+            const token = localStorage.getItem('access_token');
+            if (token) {
+                authNav.innerHTML = `<a href="#" onclick="localStorage.removeItem('access_token'); localStorage.removeItem('refresh_token'); location.reload();">Logout</a>`;
+            } else {
+                authNav.innerHTML = `<a href="login.html">Login</a>`;
+            }
+
             loadGallery();
         });
 
@@ -121,17 +73,13 @@
             const galleryGrid = document.getElementById('galleryGrid');
             const emptyState = document.getElementById('emptyState');
             
-            // Create placeholder gallery items
             const galleryItems = [
-                { title: 'Sunset', emoji: '🌅' },
-                { title: 'Mountains', emoji: '🏔️' },
-                { title: 'Ocean', emoji: '🌊' },
-                { title: 'Forest', emoji: '🌲' },
-                { title: 'City', emoji: '🏙️' },
-                { title: 'Desert', emoji: '🏜️' },
-                { title: 'Lake', emoji: '🏞️' },
-                { title: 'Stars', emoji: '⭐' },
-                { title: 'Flowers', emoji: '🌸' }
+                { title: 'Coastline', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800' },
+                { title: 'Mountain Peak', img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=800' },
+                { title: 'Urban Flow', img: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&q=80&w=800' },
+                { title: 'Forest Path', img: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=800' },
+                { title: 'Desert Sands', img: 'https://images.unsplash.com/photo-1473580044384-7ba9967e16a0?auto=format&fit=crop&q=80&w=800' },
+                { title: 'Starry Night', img: 'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&q=80&w=800' }
             ];
 
             if (galleryItems.length === 0) {
@@ -140,24 +88,11 @@
             }
 
             galleryGrid.innerHTML = '';
-            
-            galleryItems.forEach((item, index) => {
-                const galleryItem = document.createElement('div');
-                galleryItem.className = 'gallery-item';
-                galleryItem.innerHTML = `
-                    <div class="gallery-placeholder">
-                        <div>
-                            <div style="font-size: 4rem; margin-bottom: 0.5rem;">${item.emoji}</div>
-                            <div style="font-size: 1rem; font-weight: 500;">${item.title}</div>
-                        </div>
-                    </div>
-                `;
-                
-                galleryItem.addEventListener('click', () => {
-                    alert(`Gallery item: ${item.title}\n\nThis is a placeholder gallery. In a real application, this would open a modal or navigate to a detailed view.`);
-                });
-                
-                galleryGrid.appendChild(galleryItem);
+            galleryItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'gallery-item';
+                div.innerHTML = `<img src="${item.img}" alt="${item.title}">`;
+                galleryGrid.appendChild(div);
             });
         }
     </script>

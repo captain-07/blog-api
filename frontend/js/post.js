@@ -1,23 +1,31 @@
 /**
  * Post Detail Page JavaScript
- * Handles individual post display and like functionality
+ * Handles individual post display, likes, and comments
  */
 
 // State management
 let currentPost = null;
 let isLoading = false;
+let isLiked = false;
 
 // DOM elements
 const loadingState = document.getElementById('loadingState');
 const errorState = document.getElementById('errorState');
 const postDetail = document.getElementById('postDetail');
-const backButton = document.getElementById('backButton');
+const likeBtn = document.getElementById('likeBtn');
+const likeIcon = document.getElementById('likeIcon');
+const likeCount = document.getElementById('likeCount');
+const commentCount = document.getElementById('commentCount');
+const commentInput = document.getElementById('commentInput');
+const submitComment = document.getElementById('submitComment');
+const commentsList = document.getElementById('commentsList');
+const commentFormContainer = document.getElementById('commentFormContainer');
+const loginToComment = document.getElementById('loginToComment');
 
 /**
  * Initialize the post detail page
  */
 document.addEventListener('DOMContentLoaded', function() {
-    // Get post slug from URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const slug = urlParams.get('slug');
     
@@ -26,33 +34,23 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
+    // Auth check for comment form
+    if (localStorage.getItem('access_token')) {
+        commentFormContainer.style.display = 'block';
+        loginToComment.style.display = 'none';
+    }
+
     loadPost(slug);
     setupEventListeners();
 });
 
-/**
- * Setup event listeners
- */
 function setupEventListeners() {
-    // Back button functionality
-    backButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        
-        // Try to go back in history, otherwise go to home
-        if (window.history.length > 1) {
-            window.history.back();
-        } else {
-            window.location.href = 'index.html';
-        }
-    });
+    likeBtn.addEventListener('click', handleLike);
+    submitComment.addEventListener('click', handleSubmitComment);
 }
 
-/**
- * Load post from API
- */
 async function loadPost(slug) {
     if (isLoading) return;
-
     isLoading = true;
     showLoading();
 
@@ -60,6 +58,7 @@ async function loadPost(slug) {
         const post = await window.BlogAPI.getPost(slug);
         currentPost = post;
         renderPost(post);
+        await loadComments(slug);
         showPost();
     } catch (error) {
         console.error('Error loading post:', error);
@@ -69,192 +68,129 @@ async function loadPost(slug) {
     }
 }
 
-/**
- * Render post to the DOM
- */
 function renderPost(post) {
-    // Handle different data structures
-    const title = post.title || 'Untitled';
-    const content = post.content || post.body || '';
-    const authorName = post.author?.username || post.author_name || 'Unknown Author';
-    const authorId = post.author?.id || post.author_id;
-    const date = post.created_at || post.published_date || post.date;
-    const postId = post.id;
-    const likeCount = post.likes || post.like_count || 0;
-    const isLiked = post.is_liked || false;
+    document.getElementById('postTitle').textContent = post.title;
+    document.getElementById('postAuthor').innerHTML = `By <a href="author.html?id=${post.author.id}">${escapeHtml(post.author.username)}</a>`;
+    document.getElementById('postMeta').textContent = `Journal — ${new Date(post.created_at).toLocaleDateString()}`;
+    
+    const image = post.featured_image || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=1200';
+    document.getElementById('postFeaturedImage').src = image;
+    document.getElementById('postContent').innerHTML = processContent(post.content);
+    
+    likeCount.textContent = post.likes_count || 0;
+    
+    // Check if liked (backend would ideally provide this, but we can check local storage or similar)
+    // For now, let's assume we can hit the endpoint and handle the error if already liked
+}
 
-    // Format date
-    const formattedDate = date ? new Date(date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    }) : '';
+async function handleLike() {
+    if (!localStorage.getItem('access_token')) {
+        window.location.href = 'login.html';
+        return;
+    }
 
-    // Process content (convert line breaks to paragraphs if needed)
-    const processedContent = processContent(content);
-
-    postDetail.innerHTML = `
-        <h1 class="post-detail-title">${escapeHtml(title)}</h1>
-        
-        <div class="post-detail-meta">
-            <div class="post-author">
-                <a href="author.html?id=${authorId}" class="post-author">
-                    ${escapeHtml(authorName)}
-                </a>
-            </div>
-            ${formattedDate ? `<div class="post-date">${formattedDate}</div>` : ''}
-            <div class="like-section">
-                <button class="like-button ${isLiked ? 'liked' : ''}" id="likeButton" data-post-id="${postId}">
-                    <span class="like-icon">${isLiked ? '❤️' : '🤍'}</span>
-                    <span class="like-count">${likeCount}</span>
-                    <span class="like-text">${likeCount === 1 ? 'Like' : 'Likes'}</span>
-                </button>
-            </div>
-        </div>
-        
-        <div class="post-detail-content">
-            ${processedContent}
-        </div>
-    `;
-
-    // Setup like button event listener
-    const likeButton = document.getElementById('likeButton');
-    if (likeButton) {
-        likeButton.addEventListener('click', handleLike);
+    try {
+        if (!isLiked) {
+            await window.BlogAPI.likePost(currentPost.slug);
+            isLiked = true;
+            likeIcon.textContent = '❤️';
+            likeCount.textContent = parseInt(likeCount.textContent) + 1;
+        } else {
+            await window.BlogAPI.unlikePost(currentPost.slug);
+            isLiked = false;
+            likeIcon.textContent = '🤍';
+            likeCount.textContent = parseInt(likeCount.textContent) - 1;
+        }
+    } catch (error) {
+        console.error('Like error:', error);
+        // If error is "Already liked", sync UI
+        if (error.status === 400) {
+            isLiked = true;
+            likeIcon.textContent = '❤️';
+        }
     }
 }
 
-/**
- * Process content for display
- */
+async function loadComments(slug) {
+    try {
+        const comments = await window.BlogAPI.getComments(slug);
+        renderComments(comments);
+    } catch (error) {
+        console.error('Error loading comments:', error);
+    }
+}
+
+function renderComments(comments) {
+    commentCount.textContent = comments.length;
+    commentsList.innerHTML = '';
+    
+    if (comments.length === 0) {
+        commentsList.innerHTML = '<p class="text-muted">No comments yet. Be the first to share your thoughts.</p>';
+        return;
+    }
+
+    comments.forEach(comment => {
+        const div = document.createElement('div');
+        div.style.marginBottom = '2rem';
+        div.style.paddingBottom = '1.5rem';
+        div.style.borderBottom = '1px solid #f5f5f5';
+        
+        div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-weight: 600; font-size: 0.9rem;">${escapeHtml(comment.user)}</span>
+                <span style="font-size: 0.8rem; color: #999;">${new Date(comment.created_at).toLocaleDateString()}</span>
+            </div>
+            <p style="font-size: 1rem; color: #444; line-height: 1.5;">${escapeHtml(comment.content)}</p>
+        `;
+        commentsList.appendChild(div);
+    });
+}
+
+async function handleSubmitComment() {
+    const content = commentInput.value.trim();
+    if (!content) return;
+
+    submitComment.disabled = true;
+    submitComment.textContent = 'Posting...';
+
+    try {
+        await window.BlogAPI.createComment(currentPost.slug, content);
+        commentInput.value = '';
+        await loadComments(currentPost.slug);
+    } catch (error) {
+        console.error('Comment error:', error);
+        alert('Failed to post comment. Please try again.');
+    } finally {
+        submitComment.disabled = false;
+        submitComment.textContent = 'Post Comment';
+    }
+}
+
 function processContent(content) {
     if (!content) return '';
-    
-    // If content contains HTML tags, use as-is
-    if (/<[^>]+>/.test(content)) {
-        return content;
-    }
-    
-    // Convert plain text to paragraphs
-    const paragraphs = content.split('\n\n').filter(p => p.trim());
-    return paragraphs.map(paragraph => {
-        // Convert single line breaks to <br> within paragraphs
-        const processedParagraph = paragraph.replace(/\n/g, '<br>');
-        return `<p>${escapeHtml(processedParagraph)}</p>`;
-    }).join('');
+    return content.split('\n\n').map(p => `<p>${escapeHtml(p).replace(/\n/g, '<br>')}</p>`).join('');
 }
 
-/**
- * Handle like button click
- */
-async function handleLike(event) {
-    event.preventDefault();
-    
-    if (!currentPost || isLoading) return;
-    
-    const likeButton = event.currentTarget;
-    const wasLiked = likeButton.classList.contains('liked');
-    
-    // Optimistic UI update
-    const likeCount = likeButton.querySelector('.like-count');
-    const likeIcon = likeButton.querySelector('.like-icon');
-    const likeText = likeButton.querySelector('.like-text');
-    
-    const currentCount = parseInt(likeCount.textContent);
-    const newCount = wasLiked ? currentCount - 1 : currentCount + 1;
-    
-    likeButton.classList.toggle('liked');
-    likeIcon.textContent = wasLiked ? '🤍' : '❤️';
-    likeCount.textContent = newCount;
-    likeText.textContent = newCount === 1 ? 'Like' : 'Likes';
-    
-    // Disable button temporarily
-    likeButton.disabled = true;
-    
-    try {
-        await window.BlogAPI.likePost(currentPost.slug);
-        
-        // Update the current post data
-        currentPost.likes = newCount;
-        currentPost.is_liked = !wasLiked;
-        
-    } catch (error) {
-        console.error('Error liking post:', error);
-        
-        // Revert optimistic update on error
-        likeButton.classList.toggle('liked');
-        likeIcon.textContent = wasLiked ? '❤️' : '🤍';
-        likeCount.textContent = currentCount;
-        likeText.textContent = currentCount === 1 ? 'Like' : 'Likes';
-        
-        // Show error message (optional)
-        showLikeError();
-    } finally {
-        likeButton.disabled = false;
-    }
-}
-
-/**
- * Show like error message
- */
-function showLikeError() {
-    // Create a temporary error message
-    const errorMessage = document.createElement('div');
-    errorMessage.className = 'alert alert-warning alert-dismissible fade show position-fixed';
-    errorMessage.style.cssText = 'top: 20px; right: 20px; z-index: 1050; max-width: 300px;';
-    errorMessage.innerHTML = `
-        <strong>Oops!</strong> Unable to update like. Please try again.
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    document.body.appendChild(errorMessage);
-    
-    // Auto-remove after 3 seconds
-    setTimeout(() => {
-        if (errorMessage.parentNode) {
-            errorMessage.parentNode.removeChild(errorMessage);
-        }
-    }, 3000);
-}
-
-/**
- * Show loading state
- */
 function showLoading() {
     loadingState.style.display = 'block';
     errorState.style.display = 'none';
     postDetail.style.display = 'none';
 }
 
-/**
- * Show post
- */
 function showPost() {
     loadingState.style.display = 'none';
     errorState.style.display = 'none';
     postDetail.style.display = 'block';
 }
 
-/**
- * Show error state
- */
 function showError() {
     loadingState.style.display = 'none';
     errorState.style.display = 'block';
     postDetail.style.display = 'none';
 }
 
-/**
- * Escape HTML to prevent XSS
- */
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
-
-// Expose functions for testing if needed
-window.PostDetail = {
-    loadPost,
-    handleLike
-};

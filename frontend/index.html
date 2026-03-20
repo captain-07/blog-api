@@ -1,123 +1,185 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog - Minimal Design</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Custom CSS -->
+
+    <title>Deb Blogs — Elegant Thoughts</title>
+
     <link rel="stylesheet" href="css/style.css">
+
 </head>
+
 <body>
-    <!-- Header -->
-    <header class="header">
+
+    <!-- Site Header -->
+
+    <header class="site-header">
+
         <div class="container">
-            <nav class="navbar navbar-expand-lg navbar-light">
-                <a href="index.html" class="navbar-brand">Blog</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.html">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" id="searchToggle">Search</a>
-                        </li>
-                        <li class="nav-item" id="authNav">
-                            <!-- Populated by JS -->
-                        </li>
-                    </ul>
-                </div>
+
+            <a href="index.html" class="logo">Deb Blogs</a>
+
+            <nav>
+
+                <ul class="nav-links">
+
+                    <li><a href="index.html" class="active">Home</a></li>
+
+                    <li><a href="gallery.html">Gallery</a></li>
+
+                    <li id="authNav">
+
+                        <!-- Populated by JS -->
+
+                    </li>
+
+                </ul>
+
             </nav>
+
         </div>
+
     </header>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const authNav = document.getElementById('authNav');
-            const token = localStorage.getItem('access_token');
-            
-            if (token) {
-                authNav.innerHTML = `<a class="nav-link" href="#" onclick="localStorage.removeItem('access_token'); localStorage.removeItem('refresh_token'); location.reload();">Logout</a>`;
-            } else {
-                authNav.innerHTML = `<a class="nav-link" href="login.html">Login</a>`;
-            }
-        });
-    </script>
 
-    <!-- Search Bar (Hidden by default) -->
-    <div class="container mb-4" id="searchBar" style="display: none;">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="input-group">
-                    <input type="text" class="form-control" id="searchInput" placeholder="Search posts...">
-                    <button class="btn btn-outline-secondary" type="button" id="searchButton">Search</button>
-                    <button class="btn btn-outline-secondary" type="button" id="clearSearch">Clear</button>
-                </div>
-            </div>
+
+    <!-- Hero Section -->
+
+    <section class="hero">
+
+        <div class="container">
+
+            <h1>Reflections on <span class="accent-text">Life & Code</span></h1>
+
+            <p class="hero-sub">A curated collection of thoughts, stories, and insights for the modern developer.</p>
+
         </div>
-    </div>
+
+    </section>
+
+
 
     <!-- Main Content -->
-    <main class="main-content">
-        <div class="container">
-            <!-- Page Title -->
-            <div class="text-center mb-5">
-                <h1>Latest Posts</h1>
-                <p class="text-muted">Discover thoughts, ideas, and stories</p>
+
+    <main class="container">
+
+        <!-- Posts Grid -->
+
+        <div id="postsContainer">
+
+            <!-- Loading State -->
+
+            <div class="loader" id="loadingState">
+
+                <div class="spinner"></div>
+
             </div>
 
-            <!-- Posts Container -->
-            <div id="postsContainer">
-                <!-- Loading State -->
-                <div class="loading" id="loadingState">
-                    <div class="loading-spinner"></div>
-                    <p>Loading posts...</p>
-                </div>
 
-                <!-- Empty State (Hidden by default) -->
-                <div class="empty-state" id="emptyState" style="display: none;">
-                    <div class="empty-state-icon">📝</div>
-                    <div class="empty-state-text">No posts found</div>
-                    <div class="empty-state-subtext">Check back later for new content</div>
-                </div>
 
-                <!-- Posts List (Populated by JavaScript) -->
-                <div id="postsList" style="display: none;">
-                    <!-- Posts will be dynamically inserted here -->
-                </div>
+            <!-- Empty State -->
+
+            <div id="emptyState" style="display: none; text-align: center; padding: 4rem;">
+
+                <p class="text-muted">The archive is currently empty. Check back soon.</p>
+
             </div>
 
-            <!-- Pagination -->
-            <div class="pagination" id="pagination" style="display: none;">
-                <button class="pagination-button" id="prevButton" disabled>Previous</button>
-                <div class="pagination-info">
-                    <span id="pageInfo">Page 1 of 1</span>
-                </div>
-                <button class="pagination-button" id="nextButton" disabled>Next</button>
+
+
+            <!-- Posts List -->
+
+            <div class="post-grid" id="postsList">
+
+                <!-- Posts will be dynamically inserted here -->
+
             </div>
+
         </div>
+
+
+
+        <!-- Pagination -->
+
+        <div class="text-center" style="margin-top: 4rem; display: none;" id="pagination">
+
+            <button class="btn btn-outline" id="prevButton" disabled>Previous</button>
+
+            <span id="pageInfo" style="margin: 0 1.5rem; font-size: 0.9rem; font-weight: 600;">Page 1 of 1</span>
+
+            <button class="btn btn-outline" id="nextButton" disabled>Next</button>
+
+        </div>
+
     </main>
 
+
+
     <!-- Footer -->
-    <footer class="footer">
+
+    <footer class="site-footer">
+
         <div class="container">
-            <p class="text-muted mb-0">&copy; 2024 Blog. Minimal design with care.</p>
+
+            <div class="footer-logo">Deb Blogs</div>
+
+            <nav class="footer-nav">
+
+                <a href="index.html">Home</a>
+
+                <a href="gallery.html">Gallery</a>
+
+                <a href="login.html">Login</a>
+
+            </nav>
+
+            <p class="copyright">&copy; 2026 Deb Blogs. Crafted with elegance.</p>
+
         </div>
+
     </footer>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- API Module -->
+
+
+    <!-- Scripts -->
+
     <script src="js/api.js"></script>
-    
-    <!-- Home Page Script -->
+
     <script src="js/home.js"></script>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const authNav = document.getElementById('authNav');
+
+            const token = localStorage.getItem('access_token');
+
+            if (token) {
+
+                authNav.innerHTML = `<a href="#" onclick="localStorage.removeItem('access_token'); localStorage.removeItem('refresh_token'); location.reload();">Logout</a>`;
+
+            } else {
+
+                authNav.innerHTML = `<a href="login.html">Login</a>`;
+
+            }
+
+        });
+
+    </script>
+
+    <!-- Vercel Analytics -->
+    <script>
+      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+
 </body>
+
 </html>
