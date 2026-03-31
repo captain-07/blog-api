@@ -17,7 +17,7 @@ A RESTful blog API built with Django and Django REST Framework for Deb Blogs.
 - **Backend**: Django 6.0.2
 - **API**: Django REST Framework
 - **Authentication**: JWT (Simple JWT)
-- **Database**: SQLite (development)
+- **Database**: SQLite (development), PostgreSQL (deployment)
 - **File Storage**: Cloudinary
 - **Environment Management**: python-dotenv
 
