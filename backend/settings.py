@@ -404,12 +404,11 @@ CORS_ALLOW_CREDENTIALS = True
 
 
 
-# Allow all origins in development (remove in production)
+# # Allow all origins in development (remove in production)
 
-if DEBUG:
+# if DEBUG:
 
-    CORS_ALLOW_ALL_ORIGINS = True
-
+#     CORS_ALLOW_ALL_ORIGINS = True
 
 
 # API Documentation Settings

@@ -30,11 +30,19 @@ class PostSerializer(serializers.ModelSerializer):
         if obj.featured_image:
             return obj.featured_image.url
         return ""
+        
+    is_liked = serializers.SerializerMethodField()
+
+    def get_is_liked(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.likes.filter(user=request.user).exists()
+        return False
     
     class Meta:
         model = Post
         fields = ["id", "title", "slug", "content", "featured_image", "status", 
-                  "created_at", "updated_at", "published_at", "comments", "likes_count", "author"]
+                  "created_at", "updated_at", "published_at", "comments", "likes_count", "author", "is_liked"]
 
 
 class RegisterSerializer(serializers.ModelSerializer):
