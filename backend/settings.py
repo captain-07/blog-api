@@ -220,7 +220,7 @@ DATABASES = {
 
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
 
-        conn_max_age=600,
+        conn_max_age=600, # consistent database connection for 600 seconds
 
         ssl_require=not DEBUG,
 
