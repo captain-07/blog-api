@@ -1,6 +1,6 @@
-# Deb Blogs API
+# Deb Builds API
 
-A RESTful blog API built with Django and Django REST Framework for Deb Blogs.
+A RESTful blog API built with Django and Django REST Framework for Deb Builds.
 
 ## Features
 
@@ -179,7 +179,7 @@ Access the admin panel at `http://localhost:8000/admin/`
 This project is licensed under the MIT License.
 
 ## Live Demo
-- 🌐 Frontend: https://deb-blogs.vercel.app
+- 🌐 Frontend: https://deb-builds.vercel.app
 - 📡 API docs: https://my-blog-evfv.onrender.com/api/docs/
 
 ## Tech Stack
