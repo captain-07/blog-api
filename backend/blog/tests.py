@@ -77,6 +77,7 @@ class PostAPITest(APITestCase):
         self.assertEqual(response.data['title'], 'Test Post')
 
     def test_create_post_unauthorized(self):
+        self.client.force_authenticate(user=self.user)
         url = '/api/posts/'
         data = {
             'title': 'New Post',

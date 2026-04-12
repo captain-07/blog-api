@@ -70,7 +70,7 @@ const getAuthor = (id) => apiRequest(`authors/${id}/`);
 const getPostsByAuthor = (authorId, page = 1) => apiRequest(`posts/?author=${authorId}&page=${page}`);
 
 // Auth Endpoints
-const login = (username, password) => apiRequest(`token/`, {
+const login = (username, password) => apiRequest(`auth/login/`, {
     method: 'POST',
     body: JSON.stringify({ username, password })
 });
@@ -80,7 +80,7 @@ const register = (username, email, password) => apiRequest(`auth/register/`, {
     body: JSON.stringify({ username, email, password })
 });
 
-const refreshToken = (refresh) => apiRequest(`token/refresh/`, {
+const refreshToken = (refresh) => apiRequest(`auth/refresh/`, {
     method: 'POST',
     body: JSON.stringify({ refresh })
 });

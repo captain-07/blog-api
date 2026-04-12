@@ -43,11 +43,13 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ["id", "title", "slug", "content", "featured_image", "status", 
                   "created_at", "updated_at", "published_at", "comments", "likes_count", "author", "is_liked"]
+        read_only_fields = ["slug", "author", "created_at", "updated_at", "published_at"]
 
 
 class RegisterSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(write_only=True, min_length=8)
+    email = serializers.EmailField(required=True)
 
     class Meta:
         model = User

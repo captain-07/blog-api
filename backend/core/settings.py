@@ -168,7 +168,7 @@ MIDDLEWARE = [
 
 
 
-ROOT_URLCONF = "backend.urls"
+ROOT_URLCONF = "core.urls"
 
 
 
@@ -202,7 +202,7 @@ TEMPLATES = [
 
 
 
-WSGI_APPLICATION = "backend.wsgi.application"
+WSGI_APPLICATION = "core.wsgi.application"
 
 
 
